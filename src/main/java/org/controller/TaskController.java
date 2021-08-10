@@ -3,12 +3,14 @@ package org.controller;
 import org.model.Task;
 import org.repository.IRepository;
 import org.repository.TaskRepository;
+import org.service.TaskService;
 
 import java.util.Date;
 import java.util.List;
 
 public class TaskController {
-    IRepository taskRepository = new TaskRepository();
+    TaskService taskService = new TaskService();
+
 
     public List<Task> showAllTasks(int id){
         //taskRepository.create(null);
@@ -25,6 +27,7 @@ public class TaskController {
     }
 
     public Task addNewTask(String taskName, String description, String alertTime){
+        taskService.addNewTask(taskName, description, alertTime);
         return null;
     }
 

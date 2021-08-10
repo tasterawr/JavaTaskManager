@@ -1,4 +1,4 @@
-package org.password_utils;
+package org.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

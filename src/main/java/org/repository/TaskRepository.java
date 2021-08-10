@@ -11,14 +11,18 @@ public class TaskRepository implements IRepository<Task>{
     @Override
     public Task create(Task entity) throws ClassNotFoundException, SQLException{
         Connection connection = DatabaseConnector.connect();
-        String sql = "INSERT INTO task(name, description) VALUES(?, ?)";
+        String sql = "INSERT INTO task(name, description, alert_time) VALUES(?, ?, ?)";
         PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         pst.setString(1, entity.getName());
         pst.setString(2, entity.getDescription());
+        pst.setDate(3, entity.getAlertTime());
         pst.executeUpdate();
-        System.out.println("Query Completed");
-        connection.close();
-        return null;
+        ResultSet rsKeys = pst.getGeneratedKeys();
+        if (rsKeys.next()){
+            entity.setId(rsKeys.getInt(1));
+        }
+
+        return entity;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class TaskRepository implements IRepository<Task>{
     }
 
     @Override
-    public void delete(int it) {
-
+    public boolean delete(int id) {
+        return true;
     }
 }

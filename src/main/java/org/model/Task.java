@@ -1,6 +1,7 @@
 package org.model;
 
-import java.util.Date;
+import java.sql.Date;
+import java.util.Calendar;
 
 public class Task extends Entity{
     private int id;
@@ -45,17 +46,22 @@ public class Task extends Entity{
         return alertReceived;
     }
 
-    public void setAlertReceived(boolean alertReceived) {
-        this.alertReceived = alertReceived;
+    public void setAlertReceived() {
+        Date currentDate = new Date(Calendar.getInstance().getTime().getTime());
+        if (alertTime.compareTo(currentDate) <= 0)
+            this.alertReceived = true;
+        else
+            this.alertReceived = false;
     }
 
     @Override
     public String toString() {
         return "" +
                 "Task ID: " + id +
-                "\nName'" + name +
-                "\ndescription='" + description +
-                "\nalertTime=" + alertTime +
-                "\nalertReceived=" + alertReceived;
+                "\nName: " + name +
+                "\nDescription: " + description +
+                "\nAlert date: " + alertTime +
+                "\nAlert Received: " + alertReceived +
+                "\n";
     }
 }

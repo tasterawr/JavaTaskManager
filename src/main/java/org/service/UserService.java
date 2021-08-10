@@ -1,8 +1,9 @@
 package org.service;
 
 import org.model.User;
-import org.password_utils.PasswordEncryptor;
-import org.repository.IRepository;
+import org.utils.CurrentUser;
+import org.utils.MessageGenerator;
+import org.utils.PasswordEncryptor;
 import org.repository.UserRepository;
 
 import java.sql.SQLException;
@@ -15,9 +16,17 @@ public class UserService {
         String encryptedPassword = PasswordEncryptor.encrypt(password);
         try{
             user = userRepository.getUserByLoginPass(login, encryptedPassword);
+            if (user != null){
+                MessageGenerator.setMessage("Logged in successfully!");
+                CurrentUser.setUser(user);
+            }
+
+            else
+                MessageGenerator.setMessage("Wrong login or password.");
             return user;
         }
         catch (ClassNotFoundException | SQLException e){
+            MessageGenerator.setMessage("Error: Log in unsuccessful.");
             return null;
         }
     }
@@ -32,17 +41,41 @@ public class UserService {
 
         try{
             User result = userRepository.create(user);
-            if (result != null)
+            if (result != null){
+                MessageGenerator.setMessage("New user was registered successfully.");
+                CurrentUser.setUser(result);
                 return true;
-            else return false;
+            }
+            else{
+                MessageGenerator.setMessage("Error: Username already exists.");
+                return false;
+            }
         }
         catch (ClassNotFoundException | SQLException e){
+            MessageGenerator.setMessage("Error: New user was not registered.");
             return false;
         }
 
     }
 
     public boolean deleteUser(String username, String password){
-        return false;
+        try{
+            User user = userRepository.getUserByLoginPass(username, PasswordEncryptor.encrypt(password));
+            if (user == null){
+                MessageGenerator.setMessage("Error: User not found.");
+                return false;
+            }
+
+            userRepository.delete(user.getId());
+            //also delete tasks for user
+            MessageGenerator.setMessage("User was deleted successfully.");
+
+        }
+        catch (ClassNotFoundException | SQLException e){
+            MessageGenerator.setMessage("Error: User was not deleted.");
+            return false;
+        }
+
+        return true;
     }
 }

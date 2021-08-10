@@ -26,7 +26,7 @@ public class WatcherForTasksRepository implements IRepository<WatcherForTasks> {
     }
 
     @Override
-    public void delete(int it) {
-
+    public boolean delete(int id) {
+        return true;
     }
 }

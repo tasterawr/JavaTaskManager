@@ -8,5 +8,5 @@ public interface IRepository<T> {
     T getEntity(int id);
     List<T> getAll();
     T update(T entity);
-    void delete(int it);
+    boolean delete(int id) throws ClassNotFoundException, SQLException;
 }

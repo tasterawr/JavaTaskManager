@@ -43,12 +43,8 @@ public class UserRepository implements IRepository<User>{
         pst.setString(1, login);
         pst.setString(2, password);
         ResultSet result = pst.executeQuery();
-        try{
-            result.next();
-        }
-        catch(SQLException e){
+        if (result.next() == false)
             return null;
-        }
 
         User user = new User();
         user.setId(Integer.parseInt(result.getString("id")));
@@ -71,7 +67,14 @@ public class UserRepository implements IRepository<User>{
     }
 
     @Override
-    public void delete(int it) {
-
+    public boolean delete(int id) throws ClassNotFoundException, SQLException {
+        Connection connection = DatabaseConnector.connect();
+        String sql = "DELETE FROM users WHERE id = ?";
+        PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        pst.setInt(1, id);
+        int result = pst.executeUpdate();
+        if (result != 0)
+            return true;
+        else return false;
     }
 }

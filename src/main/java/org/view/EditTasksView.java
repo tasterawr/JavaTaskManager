@@ -1,40 +1,66 @@
 package org.view;
 
+import org.controller.ListOfTasksController;
 import org.controller.TaskController;
 import org.model.Task;
+import org.utils.CurrentUser;
+import org.utils.MessageGenerator;
 
-import java.util.Date;
+import java.sql.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class EditTasksView {
     private Scanner input = new Scanner(System.in);
     private TaskController taskController = new TaskController();
+    private ListOfTasksController listOfTasksController = new ListOfTasksController();
 
     public void displayEditTasksPage(){
-        System.out.println();
-        System.out.println("------EDIT TASKS------");
-        System.out.println("1. Show all tasks");
-        System.out.println("2. Show task by id");
-        System.out.println("3. Edit task by id");
-        System.out.println("4. Add new task");
-        System.out.println("5. Delete task by id");
-        System.out.println("6. Back to main menu");
+        boolean show = true;
+        while(show) {
+            System.out.println();
+            System.out.println("------EDIT TASKS------");
+            System.out.println("1. Show all tasks");
+            System.out.println("2. Show task by id");
+            System.out.println("3. Edit task by id");
+            System.out.println("4. Add new task");
+            System.out.println("5. Delete task by id");
+            System.out.println("6. Back to main menu");
 
-        int option = Integer.parseInt(input.nextLine());
-        switch (option){
-            case 1: showAllTasks(); break;
-            case 2: showTaskById(); break;
-            case 3: editTaskById(); break;
-            case 4: addNewTask(); break;
-            case 5: deleteTaskById(); break;
-            case 6: return;
-            default: displayEditTasksPage();
+            int option = Integer.parseInt(input.nextLine());
+            switch (option) {
+                case 1:
+                    showAllTasks();
+                    break;
+                case 2:
+                    showTaskById();
+                    break;
+                case 3:
+                    editTaskById();
+                    break;
+                case 4:
+                    addNewTask();
+                    break;
+                case 5:
+                    deleteTaskById();
+                    break;
+                case 6:
+                    show = false;
+                default:
+                    displayEditTasksPage();
+            }
         }
     }
 
     private void showAllTasks(){
-        System.out.println("List of all tasks for current user:");
-        taskController.showAllTasks(1);
+        System.out.println("------TASKS FOR " + CurrentUser.getUser().getUsername() + "------");
+        List<Task> tasks = listOfTasksController.getTaskList();
+        if (tasks == null)
+            System.out.println(MessageGenerator.getMessage());
+        else{
+            for (Task task : tasks)
+                System.out.println(task);
+        }
     }
 
     private void showTaskById(){
@@ -111,9 +137,19 @@ public class EditTasksView {
         String taskName = input.nextLine();
         System.out.println("Enter task description: ");
         String taskDescription = input.nextLine();
-        System.out.println("Enter task alert time: ");
-        String alertTime = input.nextLine();
-        taskController.addNewTask(taskName, taskDescription, alertTime);
+        boolean show = true;
+        while(show) {
+            System.out.println("Enter task alert date (yyyy-mm-dd): ");
+            String alertDate = input.nextLine();
+            try {
+                Date date = Date.valueOf(alertDate);
+                taskController.addNewTask(taskName, taskDescription, alertDate);
+                show = false;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: Invalid date format.");
+            }
+        }
+
     }
 
     private void deleteTaskById(){

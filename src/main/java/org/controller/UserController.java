@@ -15,6 +15,6 @@ public class UserController {
     }
 
     public boolean deleteUser(String username, String password){
-        return false;
+        return userService.deleteUser(username, password);
     }
 }
