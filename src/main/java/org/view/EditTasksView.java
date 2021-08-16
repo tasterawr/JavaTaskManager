@@ -60,15 +60,14 @@ public class EditTasksView {
         try{
             List<Task> tasks = listOfTasksController.getTaskList(id);
             if (tasks.size() == 0){
-
+                System.out.println("");
             }
+            else
+                for (Task t : tasks)
+                    System.out.println(t);
         }
-
-
-            System.out.println(MessageGenerator.getMessage());
-        else{
-            for (Task task : tasks)
-                System.out.println(task);
+        catch (InterfaceException e){
+            System.out.println(e.getMessage());
         }
     }
 
