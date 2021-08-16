@@ -1,5 +1,7 @@
 package org.service;
 
+import org.exceptions.DAOException;
+import org.exceptions.DomainException;
 import org.model.User;
 import org.utils.CurrentUser;
 import org.utils.MessageGenerator;
@@ -12,26 +14,18 @@ public class UserService {
     UserRepository userRepository = new UserRepository();
 
     public User getUserByLoginPass(String login, String password){
-        User user = null;
         String encryptedPassword = PasswordEncryptor.encrypt(password);
         try{
-            user = userRepository.getUserByLoginPass(login, encryptedPassword);
-            if (user != null){
-                MessageGenerator.setMessage("Logged in successfully!");
-                CurrentUser.setUser(user);
-            }
-
-            else
-                MessageGenerator.setMessage("Wrong login or password.");
+            User user = userRepository.getUserByLoginPass(login, encryptedPassword);
+            CurrentUser.setUser(user);
             return user;
         }
-        catch (ClassNotFoundException | SQLException e){
-            MessageGenerator.setMessage("Error: Log in unsuccessful.");
-            return null;
+        catch (DAOException e){
+            throw new DomainException(e.getMessage(), e);
         }
     }
 
-    public boolean addNewUser(String username, String password, String firstname, String lastname, String phone){
+    public void addNewUser(String username, String password, String firstname, String lastname, String phone){
         User user = new User();
         user.setUsername(username);
         user.setPassword(PasswordEncryptor.encrypt(password));
@@ -40,20 +34,11 @@ public class UserService {
         user.setPhone(phone);
 
         try{
-            User result = userRepository.create(user);
-            if (result != null){
-                MessageGenerator.setMessage("New user was registered successfully.");
-                CurrentUser.setUser(result);
-                return true;
-            }
-            else{
-                MessageGenerator.setMessage("Error: Username already exists.");
-                return false;
-            }
+            userRepository.create(user);
+            CurrentUser.setUser(user);
         }
-        catch (ClassNotFoundException | SQLException e){
-            MessageGenerator.setMessage("Error: New user was not registered.");
-            return false;
+        catch (DAOException e){
+            throw new DomainException(e.getMessage(), e);
         }
 
     }
@@ -61,19 +46,11 @@ public class UserService {
     public boolean deleteUser(String username, String password){
         try{
             User user = userRepository.getUserByLoginPass(username, PasswordEncryptor.encrypt(password));
-            if (user == null){
-                MessageGenerator.setMessage("Error: User not found.");
-                return false;
-            }
 
             userRepository.delete(user.getId());
-            //also delete tasks for user
-            MessageGenerator.setMessage("User was deleted successfully.");
-
         }
-        catch (ClassNotFoundException | SQLException e){
-            MessageGenerator.setMessage("Error: User was not deleted.");
-            return false;
+        catch (DAOException e){
+            throw new DomainException(e.getMessage(), e);
         }
 
         return true;

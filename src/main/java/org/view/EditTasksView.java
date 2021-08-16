@@ -2,6 +2,7 @@ package org.view;
 
 import org.controller.ListOfTasksController;
 import org.controller.TaskController;
+import org.exceptions.InterfaceException;
 import org.model.Task;
 import org.utils.CurrentUser;
 import org.utils.MessageGenerator;
@@ -53,9 +54,17 @@ public class EditTasksView {
     }
 
     private void showAllTasks(){
-        System.out.println("------TASKS FOR " + CurrentUser.getUser().getUsername() + "------");
-        List<Task> tasks = listOfTasksController.getTaskList();
-        if (tasks == null)
+        //System.out.println("------TASKS FOR " + CurrentUser.getUser().getUsername() + "------");
+        System.out.println("Enter task list ID:");
+        int id = Integer.parseInt(input.nextLine());
+        try{
+            List<Task> tasks = listOfTasksController.getTaskList(id);
+            if (tasks.size() == 0){
+
+            }
+        }
+
+
             System.out.println(MessageGenerator.getMessage());
         else{
             for (Task task : tasks)
@@ -144,11 +153,18 @@ public class EditTasksView {
             try {
                 Date date = Date.valueOf(alertDate);
                 taskController.addNewTask(taskName, taskDescription, alertDate);
+                MessageGenerator.setMessage("New task added successfully.");
                 show = false;
             } catch (IllegalArgumentException e) {
-                System.out.println("Error: Invalid date format.");
+                MessageGenerator.setMessage("Error: Invalid date format.");
+            }
+            catch (InterfaceException e){
+                MessageGenerator.setMessage(e.getMessage());
+                show = false;
             }
         }
+
+        System.out.println(MessageGenerator.getMessage());
 
     }
 

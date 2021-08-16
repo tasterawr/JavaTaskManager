@@ -1,5 +1,7 @@
 package org.service;
 
+import org.exceptions.DAOException;
+import org.exceptions.DomainException;
 import org.model.Task;
 import org.repository.IRepository;
 import org.repository.ListOfTasksRepository;
@@ -29,21 +31,18 @@ public class TaskService {
         return false;
     }
 
-    public Task addNewTask(String taskName, String description, String alertTime){
+    public void addNewTask(String taskName, String description, String alertTime){
         Task task = new Task();
         task.setName(taskName);
         task.setDescription(description);
         task.setAlertTime(Date.valueOf(alertTime));
         task.setAlertReceived();
         try{
-            Task result = taskRepository.create(task);
-            listOfTasksRepository.addTask(CurrentUser.getUser().getId(), result);
-            MessageGenerator.setMessage("Error: Task was added successfully.");
-            return result;
+            taskRepository.create(task);
+            listOfTasksRepository.addTask(CurrentUser.getUser().getId(), task);
         }
-        catch(ClassNotFoundException | SQLException e){
-            MessageGenerator.setMessage("Error: Task was not added.");
-            return null;
+        catch(DAOException e){
+            throw new DomainException(e.getMessage(), e);
         }
 
     }

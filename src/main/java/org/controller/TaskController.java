@@ -1,5 +1,7 @@
 package org.controller;
 
+import org.exceptions.DomainException;
+import org.exceptions.InterfaceException;
 import org.model.Task;
 import org.repository.IRepository;
 import org.repository.TaskRepository;
@@ -26,9 +28,13 @@ public class TaskController {
         return false;
     }
 
-    public Task addNewTask(String taskName, String description, String alertTime){
-        taskService.addNewTask(taskName, description, alertTime);
-        return null;
+    public void addNewTask(String taskName, String description, String alertTime){
+        try{
+            taskService.addNewTask(taskName, description, alertTime);
+        }
+        catch (DomainException e){
+            throw new InterfaceException(e.getMessage(), e);
+        }
     }
 
     public boolean deleteTaskById(int id){

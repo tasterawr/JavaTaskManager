@@ -56,12 +56,13 @@ public class Task extends Entity{
 
     @Override
     public String toString() {
+        String alert = alertReceived ? "yes" : "no";
         return "" +
                 "Task ID: " + id +
                 "\nName: " + name +
                 "\nDescription: " + description +
                 "\nAlert date: " + alertTime +
-                "\nAlert Received: " + alertReceived +
+                "\nAlert Received: " + alert +
                 "\n";
     }
 }

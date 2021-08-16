@@ -6,8 +6,8 @@ import java.util.List;
 
 public class WatcherForTasksRepository implements IRepository<WatcherForTasks> {
     @Override
-    public WatcherForTasks create(WatcherForTasks entity) {
-        return null;
+    public void create(WatcherForTasks entity) {
+
     }
 
     @Override
@@ -21,12 +21,12 @@ public class WatcherForTasksRepository implements IRepository<WatcherForTasks> {
     }
 
     @Override
-    public WatcherForTasks update(WatcherForTasks entity) {
+    public void update(WatcherForTasks entity) {
         return null;
     }
 
     @Override
-    public boolean delete(int id) {
+    public void delete(int id) {
         return true;
     }
 }

@@ -1,25 +1,15 @@
 package org.model;
 
 public class ListOfTasks extends Entity{
-    private int id;
-    private int userId;
+    private int listId;
     private int taskId;
-    private String name;
 
-    public int getId() {
-        return id;
+    public int getListId() {
+        return listId;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setListId(int listId) {
+        this.listId = listId;
     }
 
     public int getTaskId() {
@@ -28,13 +18,5 @@ public class ListOfTasks extends Entity{
 
     public void setTaskId(int taskId) {
         this.taskId = taskId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }
