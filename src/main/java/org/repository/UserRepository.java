@@ -29,10 +29,15 @@ public class UserRepository implements IRepository<User>{
             pst.setString(3, entity.getFirstName());
             pst.setString(4, entity.getLastName());
             pst.setString(5, entity.getPhone());
-            ResultSet resultSet = pst.executeQuery();
+            pst.executeUpdate();
+
+            sql = "SELECT * FROM users WHERE username = ?";
+            pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pst.setString(1, entity.getUsername());
+            ResultSet resultSet= pst.executeQuery();
 
             if (resultSet.next()){
-                entity.setId(resultSet.getInt(1));
+                entity.setId(resultSet.getInt("id"));
             }
         }
         catch (ClassNotFoundException | SQLException e){
@@ -77,7 +82,7 @@ public class UserRepository implements IRepository<User>{
 
     @Override
     public void update(User entity) {
-        return null;
+
     }
 
     @Override

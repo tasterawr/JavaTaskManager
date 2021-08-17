@@ -6,6 +6,7 @@ import org.model.Task;
 import org.repository.IRepository;
 import org.repository.TaskRepository;
 import org.service.TaskService;
+import org.utils.CurrentUser;
 
 import java.util.Date;
 import java.util.List;
@@ -13,19 +14,31 @@ import java.util.List;
 public class TaskController {
     TaskService taskService = new TaskService();
 
-
-    public List<Task> showAllTasks(int id){
-        //taskRepository.create(null);
-        return null;
+    public List<Task> getAllUserTasks(){
+        try{
+            return taskService.getAllUserTasks(CurrentUser.getUser().getId());
+        }
+        catch (DomainException e){
+            throw new InterfaceException(e.getMessage(), e);
+        }
     }
 
     public Task getTaskById(int id){
-        return null;
+        try{
+            return taskService.getTaskById(id);
+        }
+        catch (DomainException e){
+            throw new InterfaceException(e.getMessage(), e);
+        }
     }
 
-    public boolean changeTaskInfo(Task task, String changeType, String newValue){
-        //update task
-        return false;
+    public void changeTaskInfo(int id, String mode, String newValue){
+        try{
+            taskService.changeTaskInfo(id, mode, newValue);
+        }
+        catch (DomainException e) {
+            throw new InterfaceException(e.getMessage(), e);
+        }
     }
 
     public void addNewTask(String taskName, String description, String alertTime){
@@ -37,7 +50,12 @@ public class TaskController {
         }
     }
 
-    public boolean deleteTaskById(int id){
-        return false;
+    public void deleteTaskById(int id){
+        try{
+            taskService.deleteTaskById(id);
+        }
+        catch (DomainException e){
+            throw new InterfaceException(e.getMessage(), e);
+        }
     }
 }

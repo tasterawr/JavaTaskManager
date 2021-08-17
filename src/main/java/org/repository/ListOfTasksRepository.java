@@ -40,7 +40,7 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
         return null;
     }
 
-    public List<Task> getListTasks(int listId) {
+    public List<Task> getListOfTasks(int listId) {
         try{
             Connection connection = DatabaseConnector.connect();
             String sql = "SELECT T.id, T.name, T.description, T.alert_time, T.alert_received " +
@@ -89,6 +89,16 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
 
     @Override
     public void delete(int id) {
+        try{
+            Connection connection = DatabaseConnector.connect();
+            String sql = "DELETE FROM list_of_tasks WHERE list_id = ?";
+            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pst.setInt(1, id);
+            pst.executeUpdate();
+        }
+        catch (ClassNotFoundException | SQLException e){
+            throw new DAOException(String.format("Error: Could not delete tasks from list ID %s.", id), e);
+        }
 
     }
 }

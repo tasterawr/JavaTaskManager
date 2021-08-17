@@ -14,9 +14,9 @@ import java.util.List;
 public class ListOfTasksController {
     private ListOfTasksService listOfTasksService = new ListOfTasksService();
 
-    public List<Task> getTaskList(int listId){
+    public List<Task> getListOfTasks(int listId){
         try {
-            return listOfTasksService.getTaskList(listId);
+            return listOfTasksService.getListOfTasks(listId);
         }
         catch (DomainException e){
             throw new InterfaceException(e.getMessage(), e);

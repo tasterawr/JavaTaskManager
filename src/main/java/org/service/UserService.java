@@ -43,7 +43,7 @@ public class UserService {
 
     }
 
-    public boolean deleteUser(String username, String password){
+    public void deleteUser(String username, String password){
         try{
             User user = userRepository.getUserByLoginPass(username, PasswordEncryptor.encrypt(password));
 
@@ -52,7 +52,5 @@ public class UserService {
         catch (DAOException e){
             throw new DomainException(e.getMessage(), e);
         }
-
-        return true;
     }
 }

@@ -22,11 +22,11 @@ public class WatcherForTasksRepository implements IRepository<WatcherForTasks> {
 
     @Override
     public void update(WatcherForTasks entity) {
-        return null;
+
     }
 
     @Override
     public void delete(int id) {
-        return true;
+
     }
 }

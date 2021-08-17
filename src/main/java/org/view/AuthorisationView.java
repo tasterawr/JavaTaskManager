@@ -1,5 +1,6 @@
 package org.view;
 
+import org.controller.TaskListController;
 import org.controller.UserController;
 import org.exceptions.InterfaceException;
 import org.model.User;
@@ -8,9 +9,10 @@ import org.utils.MessageGenerator;
 import java.util.Scanner;
 
 public class AuthorisationView {
-    private Scanner input = new Scanner(System.in);
-    MainMenuView mainMenuView = new MainMenuView();
-    UserController userController = new UserController();
+    private final Scanner input = new Scanner(System.in);
+    private final MainMenuView mainMenuView = new MainMenuView();
+    private final UserController userController = new UserController();
+    private final TaskListController taskListController = new TaskListController();
 
     public void displayAuthorisationMenu(){
         boolean show = true;
@@ -40,14 +42,12 @@ public class AuthorisationView {
         System.out.println("Enter password: ");
         String password = input.nextLine();
         try{
-            User user = userController.getUserByLoginPass(login, password);
-            MessageGenerator.setMessage("Logged in successfully!");
-            System.out.println(MessageGenerator.getMessage());
+            userController.getUserByLoginPass(login, password);
+            System.out.println("Logged in successfully!");
             mainMenuView.displayMainMenu();
         }
         catch(InterfaceException e){
-            MessageGenerator.setMessage(e.getMessage());
-            System.out.println(MessageGenerator.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
@@ -73,20 +73,20 @@ public class AuthorisationView {
                 match = true;
                 try{
                     userController.addNewUser(username,password,firstname,lastname,phone);
-                    MessageGenerator.setMessage("New user signed in successfully.");
+                    System.out.println("New user signed in successfully.");
+                    taskListController.addTaskList(String.format("%s default task list", username));
+                    mainMenuView.displayMainMenu();
                 }
                 catch(InterfaceException e){
-                    MessageGenerator.setMessage(e.getMessage());
+                    System.out.println(e.getMessage());
                 }
 
-                System.out.println(MessageGenerator.getMessage());
                 displayAuthorisationMenu();
             }
             else{
                 System.out.println("Passwords don't match: ");
             }
         }
-
     }
 
     private void displayDeleteUserPage(){
@@ -103,13 +103,13 @@ public class AuthorisationView {
 
             if (passwordCheck.equals(password)){
                 match = true;
-                boolean result = userController.deleteUser(username, password);
-                System.out.println(MessageGenerator.getMessage());
-                if (result){
-                    mainMenuView.displayMainMenu();
-                }
-                else{
+                try{
+                    userController.deleteUser(username, password);
+                    System.out.println("User deleted successfully!");
                     displayAuthorisationMenu();
+                }
+                catch (InterfaceException e){
+                    System.out.println(e.getMessage());
                 }
             }
             else{

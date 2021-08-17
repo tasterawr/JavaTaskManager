@@ -27,7 +27,12 @@ public class UserController {
 
     }
 
-    public boolean deleteUser(String username, String password){
-        return userService.deleteUser(username, password);
+    public void deleteUser(String username, String password){
+        try{
+            userService.deleteUser(username, password);
+        }
+        catch (DomainException e){
+            throw new InterfaceException(e.getMessage(), e);
+        }
     }
 }

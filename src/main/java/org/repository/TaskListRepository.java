@@ -33,7 +33,7 @@ public class TaskListRepository implements IRepository<TaskList> {
     public TaskList getEntity(int id) {
         try {
             Connection connection = DatabaseConnector.connect();
-            String sql = "SELECT FROM task_list WHERE id = ?";
+            String sql = "SELECT * FROM task_list WHERE id = ?";
             PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             pst.setInt(1, id);
             ResultSet resultSet= pst.executeQuery();
@@ -49,6 +49,28 @@ public class TaskListRepository implements IRepository<TaskList> {
         }
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Could not get task list.");
+        }
+    }
+
+    public TaskList getListByName(String name){
+        try{
+            Connection connection = DatabaseConnector.connect();
+            String sql = "SELECT * FROM task_list WHERE name = ?";
+            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pst.setString(1, name);
+            ResultSet resultSet= pst.executeQuery();
+            if (!resultSet.next())
+                throw new DAOException(String.format("Error: No task list with name \"%s\".", name));
+
+            TaskList taskList = new TaskList();
+            taskList.setId(resultSet.getInt("id"));
+            taskList.setUserId(resultSet.getInt("user_id"));
+            taskList.setName(resultSet.getString("name"));
+
+            return taskList;
+        }
+        catch (ClassNotFoundException | SQLException e){
+            throw new DAOException(String.format("Error: Could not get task list with name \"%s\".", name));
         }
     }
 
