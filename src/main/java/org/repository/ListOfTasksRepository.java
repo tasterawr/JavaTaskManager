@@ -17,16 +17,32 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
     }
 
     public void addTask(int listId, int taskId) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "INSERT INTO list_of_tasks(list_id, task_id) VALUES(?, ?)";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, listId);
-            pst.setInt(2, taskId);
-            pst.executeUpdate();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, listId);
+            statement.setInt(2, taskId);
+            statement.executeUpdate();
         }
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException(String.format("Error: Task ID %s could not be added to the task list ID %s.", taskId, listId), e);
+        }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
         }
     }
 
@@ -41,15 +57,17 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
     }
 
     public List<Task> getListOfTasks(int listId) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "SELECT T.id, T.name, T.description, T.alert_time, T.alert_received " +
                     "FROM list_of_tasks INNER JOIN task T " +
                     "ON task_id = T.id " +
                     "WHERE list_id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, listId);
-            ResultSet resultSet = pst.executeQuery();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, listId);
+            ResultSet resultSet = statement.executeQuery();
             List<Task> tasks = new ArrayList<>();
             while(resultSet.next()){
                 Task task = new Task();
@@ -66,6 +84,20 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException(String.format("Error: Could not get tasks for list ID %s.", listId), e);
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     @Override
@@ -74,31 +106,62 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
     }
 
     public void changeTaskList(int taskId, int newListId){
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "UPDATE list_of_tasks SET list_id = ? WHERE task_id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, newListId);
-            pst.setInt(2, taskId);
-            ResultSet resultSet = pst.executeQuery();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, newListId);
+            statement.setInt(2, taskId);
+            ResultSet resultSet = statement.executeQuery();
         }
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException(String.format("Error: Could not put task ID %s to list ID %s.", taskId, newListId), e);
+        }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
         }
     }
 
     @Override
     public void delete(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "DELETE FROM list_of_tasks WHERE list_id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, id);
-            pst.executeUpdate();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, id);
+            statement.executeUpdate();
         }
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException(String.format("Error: Could not delete tasks from list ID %s.", id), e);
         }
-
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 }

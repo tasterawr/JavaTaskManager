@@ -13,30 +13,48 @@ public class TaskListRepository implements IRepository<TaskList> {
 
     @Override
     public void create(TaskList entity)  {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "INSERT INTO task_list(id, user_id, name) VALUES(?, ?, ?)";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, entity.getId());
-            pst.setInt(2, entity.getUserId());
-            pst.setString(3, entity.getName());
-            int result = pst.executeUpdate();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, entity.getId());
+            statement.setInt(2, entity.getUserId());
+            statement.setString(3, entity.getName());
+            int result = statement.executeUpdate();
             if (result != 1)
                 throw new DAOException("Error: Task list with such name already exists.");
         }
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Could not create new task list.");
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     @Override
     public TaskList getEntity(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "SELECT * FROM task_list WHERE id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, id);
-            ResultSet resultSet= pst.executeQuery();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, id);
+            ResultSet resultSet= statement.executeQuery();
             if (!resultSet.next())
                 throw new DAOException("Error: No task list with such id.");
 
@@ -50,15 +68,31 @@ public class TaskListRepository implements IRepository<TaskList> {
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Could not get task list.");
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     public TaskList getListByName(String name){
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "SELECT * FROM task_list WHERE name = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1, name);
-            ResultSet resultSet= pst.executeQuery();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, name);
+            ResultSet resultSet= statement.executeQuery();
             if (!resultSet.next())
                 throw new DAOException(String.format("Error: No task list with name \"%s\".", name));
 
@@ -72,6 +106,20 @@ public class TaskListRepository implements IRepository<TaskList> {
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException(String.format("Error: Could not get task list with name \"%s\".", name));
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     @Override
@@ -80,12 +128,14 @@ public class TaskListRepository implements IRepository<TaskList> {
     }
 
     public List<TaskList> getListsForUser(int userId){
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "SELECT * FROM task_list WHERE user_id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, userId);
-            ResultSet resultSet= pst.executeQuery();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, userId);
+            ResultSet resultSet= statement.executeQuery();
 
             List<TaskList> taskLists = new ArrayList<>();
             while (resultSet.next()){
@@ -101,36 +151,82 @@ public class TaskListRepository implements IRepository<TaskList> {
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Could not get task list.");
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     @Override
     public void update(TaskList entity) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "UPDATE task_list SET name = ? WHERE id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1, entity.getName());
-            pst.setInt(2, entity.getId());
-            pst.executeUpdate();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, entity.getName());
+            statement.setInt(2, entity.getId());
+            statement.executeUpdate();
         }
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Could not get task list.");
+        }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
         }
     }
 
     @Override
     public void delete(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "DELETE FROM task_list WHERE id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, id);
-            int result = pst.executeUpdate();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, id);
+            int result = statement.executeUpdate();
             if (result != 1)
                 throw new DAOException("Error: No task list with such id.");
         }
         catch (ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Could not delete task list.");
+        }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
         }
     }
 }

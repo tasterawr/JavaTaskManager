@@ -12,15 +12,17 @@ public class TaskRepository implements IRepository<Task>{
 
     @Override
     public void create(Task entity) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "INSERT INTO task(name, description, alert_time) VALUES(?, ?, ?)";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1, entity.getName());
-            pst.setString(2, entity.getDescription());
-            pst.setDate(3, entity.getAlertTime());
-            pst.executeUpdate();
-            ResultSet rsKeys = pst.getGeneratedKeys();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, entity.getName());
+            statement.setString(2, entity.getDescription());
+            statement.setDate(3, entity.getAlertTime());
+            statement.executeUpdate();
+            ResultSet rsKeys = statement.getGeneratedKeys();
             if (rsKeys.next()) {
                 entity.setId(rsKeys.getInt(1));
             }
@@ -28,16 +30,32 @@ public class TaskRepository implements IRepository<Task>{
         catch(ClassNotFoundException | SQLException e){
             throw new DAOException("Error: New task wasn't created.", e);
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     @Override
     public Task getEntity(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "SELECT * 1FROM task WHERE id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, id);
-            ResultSet resultSet = pst.executeQuery();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next() == false)
                 throw new DAOException("Error: No task with such id.");
 
@@ -52,6 +70,20 @@ public class TaskRepository implements IRepository<Task>{
         catch(ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Couldn't get requested task.", e);
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     @Override
@@ -60,8 +92,10 @@ public class TaskRepository implements IRepository<Task>{
     }
 
     public List<Task> getAllUserTasks(int userId){
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql =
                     " SELECT T.id, T.name, T.description, T.alert_time" +
                     " FROM (SELECT L.task_id" +
@@ -71,9 +105,9 @@ public class TaskRepository implements IRepository<Task>{
                     "   INNER JOIN task T" +
                     "   ON TAB.task_id = T.id";
 
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setInt(1, userId);
-            ResultSet resultSet = pst.executeQuery();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
             List<Task> tasks = new ArrayList<>();
             while(resultSet.next()){
                 Task task = new Task();
@@ -90,23 +124,53 @@ public class TaskRepository implements IRepository<Task>{
         catch(ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Couldn't get requested tasks.", e);
         }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
+        }
     }
 
     @Override
     public void update(Task entity) {
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = DatabaseConnector.connect();
+            connection = DatabaseConnector.connect();
             String sql = "UPDATE tasks SET name = ?, description = ?, alert_time = ? " +
                     " WHERE id = ?";
-            PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1, entity.getName());
-            pst.setString(2, entity.getDescription());
-            pst.setDate(3, entity.getAlertTime());
-            pst.setInt(4, entity.getId());
-            int result = pst.executeUpdate();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, entity.getName());
+            statement.setString(2, entity.getDescription());
+            statement.setDate(3, entity.getAlertTime());
+            statement.setInt(4, entity.getId());
+            int result = statement.executeUpdate();
         }
         catch(ClassNotFoundException | SQLException e){
             throw new DAOException("Error: Couldn't update requested task.", e);
+        }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                //log Could not close connection
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                //log Could not close statement
+            }
         }
     }
 

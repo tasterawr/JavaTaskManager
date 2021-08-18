@@ -27,26 +27,23 @@ public class EditTasksView {
             System.out.println("6. Back to main menu");
 
             int option = Integer.parseInt(input.nextLine());
-            switch (option) {
-                case 1:
-                    showAllTasks();
-                    break;
-                case 2:
-                    showTaskById();
-                    break;
-                case 3:
-                    editTaskById();
-                    break;
-                case 4:
-                    addNewTask();
-                    break;
-                case 5:
-                    deleteTaskById();
-                    break;
-                case 6:
-                    show = false;
-                default:
-                    break;
+            if (option == 1){
+                showAllTasks();
+            }
+            else if (option == 2){
+                showTaskById();
+            }
+            else if (option == 3){
+                editTaskById();
+            }
+            else if (option == 4){
+                addNewTask();
+            }
+            else if (option == 5){
+                deleteTaskById();
+            }
+            else if (option == 6){
+                show = false;
             }
         }
     }
