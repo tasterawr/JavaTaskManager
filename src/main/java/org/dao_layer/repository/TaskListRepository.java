@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskListRepository implements IRepository<TaskList> {
-    static final Logger LOGGER = Logger.getLogger(UserRepository.class);
+    static final Logger LOGGER = Logger.getLogger(TaskListRepository.class);
     static final String PATH = "src/main/resources/log4j.properties";
 
     @Override
@@ -231,11 +231,15 @@ public class TaskListRepository implements IRepository<TaskList> {
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, id);
             int result = statement.executeUpdate();
-            if (result != 1)
-                throw new DAOException("Error: No task list with such id.");
+            if (result != 1){
+                LOGGER.error(String.format("No task list with id %s.", id));
+                throw new DAOException(String.format(String.format("Error: No task list with id %s.", id)));
+            }
+
         }
         catch (ClassNotFoundException | SQLException e){
-            throw new DAOException("Error: Could not delete task list.");
+            LOGGER.error(String.format("Could not delete task list (id: %s).", id));
+            throw new DAOException(String.format("Error: Could not delete task list (id: %s).", id));
         }
         finally {
             try{

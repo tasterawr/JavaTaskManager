@@ -1,5 +1,7 @@
 package org.dao_layer.repository;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.dao_layer.db_connection.DatabaseConnector;
 import org.exceptions.DAOException;
 import org.dao_layer.model.ListOfTasks;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListOfTasksRepository implements IRepository<ListOfTasks> {
+    static final Logger LOGGER = Logger.getLogger(ListOfTasksRepository.class);
+    static final String PATH = "src/main/resources/log4j.properties";
 
     @Override
     public void create(ListOfTasks entity) {
@@ -17,6 +21,7 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
     }
 
     public void addTask(int listId, int taskId) {
+        PropertyConfigurator.configure(PATH);
         Connection connection = null;
         PreparedStatement statement = null;
         try{
@@ -26,22 +31,24 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
             statement.setInt(1, listId);
             statement.setInt(2, taskId);
             statement.executeUpdate();
+            LOGGER.info(String.format("Task (id: %s) was successfully added to list (id: %s)", taskId, listId));
         }
         catch (ClassNotFoundException | SQLException e){
-            throw new DAOException(String.format("Error: Task ID %s could not be added to the task list ID %s.", taskId, listId), e);
+            LOGGER.error(String.format("Task (id: %s) could not be added to the task list (id: %s).", taskId, listId), e);
+            throw new DAOException(String.format("Error: Task (id: %s) could not be added to the task list (id: %s).", taskId, listId), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }
@@ -78,24 +85,26 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
                 task.setAlertReceived();
                 tasks.add(task);
             }
+            LOGGER.info(String.format("Tasks from list (id: %s) were received successfully.", listId));
 
             return tasks;
         }
         catch (ClassNotFoundException | SQLException e){
-            throw new DAOException(String.format("Error: Could not get tasks for list ID %s.", listId), e);
+            LOGGER.error(String.format("Could not get tasks for list (id: %s).", listId), e);
+            throw new DAOException(String.format("Error: Could not get tasks for list (id: %s).", listId), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }
@@ -114,23 +123,25 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, newListId);
             statement.setInt(2, taskId);
-            ResultSet resultSet = statement.executeQuery();
+            statement.executeUpdate();
+            LOGGER.info(String.format("Task (id: %s) was moved to list (id: %s) successfully.", taskId, newListId));
         }
         catch (ClassNotFoundException | SQLException e){
-            throw new DAOException(String.format("Error: Could not put task ID %s to list ID %s.", taskId, newListId), e);
+            LOGGER.error(String.format("Error: Could not move task (id: %s) to list (id: %s).", taskId, newListId), e);
+            throw new DAOException(String.format("Error: Could not move task (id: %s) to list (id: %s).", taskId, newListId), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }
@@ -145,22 +156,24 @@ public class ListOfTasksRepository implements IRepository<ListOfTasks> {
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, id);
             statement.executeUpdate();
+            LOGGER.info(String.format("Task list (id: %s) was deleted successfully.", id));
         }
         catch (ClassNotFoundException | SQLException e){
-            throw new DAOException(String.format("Error: Could not delete tasks from list ID %s.", id), e);
+            LOGGER.error(String.format("Error: Could not delete task list (id: %s).", id), e);
+            throw new DAOException(String.format("Error: Could not delete task list (id: %s).", id), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }

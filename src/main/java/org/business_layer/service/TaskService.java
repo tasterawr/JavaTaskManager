@@ -38,11 +38,14 @@ public class TaskService {
     public void changeTaskInfo(int id, String mode, String newValue){
         try{
             Task task = taskRepository.getEntity(id);
-            switch (mode){
-                case "name": task.setName(newValue); break;
-                case "description": task.setDescription(newValue); break;
-                case "alert_time": task.setAlertTime(Date.valueOf(newValue));
-                default: break;
+            if (mode.equals("name")){
+                task.setName(newValue);
+            }
+            else if (mode.equals("description")){
+                task.setDescription(newValue);
+            }
+            else if (mode.equals("alert_time")){
+                task.setAlertTime(Date.valueOf(newValue));
             }
 
             taskRepository.update(task);

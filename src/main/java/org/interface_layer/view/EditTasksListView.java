@@ -92,14 +92,83 @@ public class EditTasksListView {
     }
 
     private void editTaskListById(){
+        boolean show = true;
+        while(show){
+            System.out.println("------EDIT TASK LIST------");
+            System.out.println("1. Change task list name");
+            System.out.println("2. Back to main menu");
 
+            try{
+                int option = Integer.parseInt(input.nextLine());
+                if (option == 1){
+                    changeTaskListName();
+                }
+                else if (option == 2){
+                    show = false;
+                }
+            }
+            catch (NumberFormatException e){
+                continue;
+            }
+        }
+    }
+
+    private void changeTaskListName(){
+        boolean show = true;
+        int id = -1;
+        while(show) {
+            System.out.println("Enter task list id:");
+            try {
+                id = Integer.parseInt(input.nextLine());
+                show = false;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: input is not an id.");
+            }
+        }
+
+        System.out.println("Enter new task list name: ");
+        String newTaskListName = input.nextLine();
+        try{
+            taskListController.updateTaskList(id, "name", newTaskListName);
+            System.out.println("Update successful.");
+        }
+        catch (InterfaceException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void addNewTaskList(){
-
+        System.out.println("Enter name of a new task list:");
+        String taskListName = input.nextLine();
+        try{
+            taskListController.addTaskList(taskListName);
+            System.out.println("New task list was created successfully!");
+        }
+        catch (InterfaceException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void deleteTaskListById(){
+        System.out.println("Enter id of a task list to delete:");
+        int id = -1;
+        boolean isNotValid = true;
+        while(isNotValid){
+            try{
+                id = Integer.parseInt(input.nextLine());
+                isNotValid = false;
+            }
+            catch (NumberFormatException e){
+                System.out.println("Not a valid id.");
+            }
+        }
 
+        try{
+            taskListController.deleteTaskList(id);
+            System.out.println("Task list was deleted successfully!");
+        }
+        catch (InterfaceException e){
+            System.out.println(e.getMessage());
+        }
     }
 }

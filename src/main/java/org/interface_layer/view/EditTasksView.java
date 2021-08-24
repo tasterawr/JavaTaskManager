@@ -1,8 +1,11 @@
 package org.interface_layer.view;
 
+import org.exceptions.DomainException;
+import org.interface_layer.controller.ListOfTasksController;
 import org.interface_layer.controller.TaskController;
 import org.exceptions.InterfaceException;
 import org.dao_layer.model.Task;
+import org.interface_layer.controller.TaskListController;
 import org.utils.CurrentUser;
 import org.utils.MessageGenerator;
 
@@ -13,6 +16,7 @@ import java.util.Scanner;
 public class EditTasksView {
     private final Scanner input = new Scanner(System.in);
     private final TaskController taskController = new TaskController();
+    private final ListOfTasksController listOfTasksController = new ListOfTasksController();
 
     public void displayEditTasksPage(){
         boolean show = true;
@@ -105,15 +109,24 @@ public class EditTasksView {
             System.out.println("    1. Change task name");
             System.out.println("    2. Change task description");
             System.out.println("    3. Change task alert time");
-            System.out.println("    4. Back to task menu");
+            System.out.println("    4. Move task to other list");
+            System.out.println("    5. Back to task menu");
 
             int option = Integer.parseInt(input.nextLine());
-            switch (option){
-                case 1: changeTaskNamePage(); break;
-                case 2: changeTaskDescrPage(); break;
-                case 3: changeTaskAlertTimePage(); break;
-                case 4: show = false;
-                default: break;
+            if (option == 1){
+                changeTaskNamePage();
+            }
+            else if (option == 2){
+                changeTaskDescrPage();
+            }
+            else if (option == 3) {
+                changeTaskAlertTimePage();
+            }
+            else if (option == 4) {
+                setNewTaskList();
+            }
+            else if (option == 5){
+                show = false;
             }
         }
     }
@@ -196,13 +209,46 @@ public class EditTasksView {
         }
 
         try{
-            taskController.changeTaskInfo(id, "alertTime", newAlertTime);
+            taskController.changeTaskInfo(id, "alert_time", newAlertTime);
             System.out.println("Update successful.");
         }
         catch (InterfaceException e){
             System.out.println(e.getMessage());
         }
+    }
 
+    private void setNewTaskList(){
+        boolean isNotValid = true;
+        int taskId = -1;
+        int newListId = -1;
+        while(isNotValid) {
+            System.out.println("Enter task id:");
+            try {
+                taskId = Integer.parseInt(input.nextLine());
+                isNotValid = false;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: input is not an id.");
+            }
+        }
+
+        isNotValid = true;
+        while(isNotValid) {
+            System.out.println("Enter new task list id:");
+            try {
+                newListId = Integer.parseInt(input.nextLine());
+                isNotValid = false;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: input is not an id.");
+            }
+        }
+
+        try{
+            listOfTasksController.changeTaskList(taskId, newListId);
+            System.out.println("Task was moved successfully!");
+        }
+        catch (DomainException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void addNewTask(){

@@ -1,5 +1,7 @@
 package org.dao_layer.repository;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.dao_layer.db_connection.DatabaseConnector;
 import org.exceptions.DAOException;
 import org.dao_layer.model.Task;
@@ -9,9 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskRepository implements IRepository<Task>{
+    static final Logger LOGGER = Logger.getLogger(TaskRepository.class);
+    static final String PATH = "src/main/resources/log4j.properties";
 
     @Override
     public void create(Task entity) {
+        PropertyConfigurator.configure(PATH);
         Connection connection = null;
         PreparedStatement statement = null;
         try {
@@ -24,24 +29,26 @@ public class TaskRepository implements IRepository<Task>{
             statement.executeUpdate();
             ResultSet rsKeys = statement.getGeneratedKeys();
             if (rsKeys.next()) {
+                LOGGER.info(String.format("New task (name: %s) was created successfully.", entity.getName()));
                 entity.setId(rsKeys.getInt(1));
             }
         }
         catch(ClassNotFoundException | SQLException e){
-            throw new DAOException("Error: New task wasn't created.", e);
+            LOGGER.error(String.format("New task (name: %s) wasn't created.", entity.getName()), e);
+            throw new DAOException(String.format("Error: New task (name: %s) wasn't created.", entity.getName()), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }
@@ -52,12 +59,14 @@ public class TaskRepository implements IRepository<Task>{
         PreparedStatement statement = null;
         try{
             connection = DatabaseConnector.connect();
-            String sql = "SELECT * 1FROM task WHERE id = ?";
+            String sql = "SELECT * FROM task WHERE id = ?";
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next() == false)
-                throw new DAOException("Error: No task with such id.");
+            if (resultSet.next() == false){
+                LOGGER.error(String.format("No task with id %s.", id));
+                throw new DAOException(String.format("Error: No task with id %s.", id));
+            }
 
             Task task = new Task();
             task.setId(resultSet.getInt("id"));
@@ -65,23 +74,26 @@ public class TaskRepository implements IRepository<Task>{
             task.setDescription(resultSet.getString("description"));
             task.setAlertTime(resultSet.getDate("alert_time"));
             task.setAlertReceived();
+            LOGGER.info(String.format("Task (id: %s) was received successfully.", id));
+
             return task;
         }
         catch(ClassNotFoundException | SQLException e){
-            throw new DAOException("Error: Couldn't get requested task.", e);
+            LOGGER.error(String.format("Couldn't get requested task (id: %s).", id), e);
+            throw new DAOException(String.format("Error: Couldn't get requested task (id: %s).", id), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }
@@ -118,24 +130,26 @@ public class TaskRepository implements IRepository<Task>{
                 task.setAlertReceived();
                 tasks.add(task);
             }
+            LOGGER.info(String.format("Tasks for user (id: %s) were received successfully.", userId));
 
             return tasks;
         }
         catch(ClassNotFoundException | SQLException e){
-            throw new DAOException("Error: Couldn't get requested tasks.", e);
+            LOGGER.error(String.format("Couldn't get requested tasks for user (id: %s).", userId), e);
+            throw new DAOException(String.format("Error: Couldn't get requested tasks for user (id: %s).", userId), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }
@@ -146,7 +160,7 @@ public class TaskRepository implements IRepository<Task>{
         PreparedStatement statement = null;
         try{
             connection = DatabaseConnector.connect();
-            String sql = "UPDATE tasks SET name = ?, description = ?, alert_time = ? " +
+            String sql = "UPDATE task SET name = ?, description = ?, alert_time = ? " +
                     " WHERE id = ?";
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, entity.getName());
@@ -154,28 +168,62 @@ public class TaskRepository implements IRepository<Task>{
             statement.setDate(3, entity.getAlertTime());
             statement.setInt(4, entity.getId());
             int result = statement.executeUpdate();
+            LOGGER.info(String.format("Task (id: %s) was updated successfully.", entity.getId()));
         }
         catch(ClassNotFoundException | SQLException e){
-            throw new DAOException("Error: Couldn't update requested task.", e);
+            LOGGER.error(String.format("Couldn't update requested task (id: %s).", entity.getId()), e);
+            throw new DAOException(String.format("Error: Couldn't update requested task (id: %s).", entity.getId()), e);
         }
         finally {
             try{
                 connection.close();
             }
             catch (SQLException e){
-                //log Could not close connection
+                LOGGER.error("Could not close the connection.", e);
             }
             try {
                 statement.close();
             }
             catch (SQLException e){
-                //log Could not close statement
+                LOGGER.error("Could not close the statement.", e);
             }
         }
     }
 
     @Override
     public void delete(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try{
+            connection = DatabaseConnector.connect();
+            String sql = "DELETE FROM task WHERE id = ?";
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, id);
+            int result = statement.executeUpdate();
+            if (result != 1){
+                LOGGER.error(String.format("No task with id %s.", id));
+                throw new DAOException(String.format("Error: No task with id %s.", id));
+            }
 
+            LOGGER.info(String.format("Task (id: %s) was deleted successfully.", id));
+        }
+        catch(ClassNotFoundException | SQLException e){
+            LOGGER.error(String.format("Couldn't delete requested task (id: %s).", id), e);
+            throw new DAOException(String.format("Error: Couldn't delete requested task (id: %s).", id), e);
+        }
+        finally {
+            try{
+                connection.close();
+            }
+            catch (SQLException e){
+                LOGGER.error("Could not close the connection.", e);
+            }
+            try {
+                statement.close();
+            }
+            catch (SQLException e){
+                LOGGER.error("Could not close the statement.", e);
+            }
+        }
     }
 }

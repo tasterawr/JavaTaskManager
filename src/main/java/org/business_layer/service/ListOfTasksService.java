@@ -10,6 +10,15 @@ import java.util.List;
 public class ListOfTasksService {
     private ListOfTasksRepository listOfTasksRepository = new ListOfTasksRepository();
 
+    public void addToListById(int listId, int taskId){
+        try{
+            listOfTasksRepository.addTask(listId, taskId);
+        }
+        catch (DAOException e){
+            throw new DomainException(e.getMessage(), e);
+        }
+    }
+
     public List<Task> getListOfTasks(int listId){
         try{
             return listOfTasksRepository.getListOfTasks(listId);
@@ -19,9 +28,9 @@ public class ListOfTasksService {
         }
     }
 
-    public void addToListById(int listId, int taskId){
+    public void changeTaskList(int taskId, int newListId){
         try{
-            listOfTasksRepository.addTask(listId, taskId);
+            listOfTasksRepository.changeTaskList(taskId, newListId);
         }
         catch (DAOException e){
             throw new DomainException(e.getMessage(), e);
