@@ -1,6 +1,6 @@
 package org.utils;
 
-import org.model.User;
+import org.dao_layer.model.User;
 
 public class CurrentUser {
     private static User user;

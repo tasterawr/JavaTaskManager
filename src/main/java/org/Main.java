@@ -1,7 +1,7 @@
 package org;
 
-import org.view.AuthorisationView;
-import org.view.MainMenuView;
+import org.interface_layer.view.AuthorisationView;
+import org.interface_layer.view.MainMenuView;
 
 public class Main {
     public static void main(String[] args) {
