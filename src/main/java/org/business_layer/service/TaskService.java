@@ -4,7 +4,6 @@ import org.exceptions.DAOException;
 import org.exceptions.DomainException;
 import org.dao_layer.model.Task;
 import org.dao_layer.model.TaskList;
-import org.dao_layer.repository.ListOfTasksRepository;
 import org.dao_layer.repository.TaskRepository;
 import org.utils.CurrentUser;
 
@@ -13,7 +12,6 @@ import java.util.List;
 
 public class TaskService {
     TaskRepository taskRepository = new TaskRepository();
-    ListOfTasksRepository listOfTasksRepository = new ListOfTasksRepository();
     TaskListService taskListService = new TaskListService();
     ListOfTasksService listOfTasksService = new ListOfTasksService();
 

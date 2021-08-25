@@ -8,7 +8,7 @@ import org.dao_layer.repository.ListOfTasksRepository;
 import java.util.List;
 
 public class ListOfTasksService {
-    private ListOfTasksRepository listOfTasksRepository = new ListOfTasksRepository();
+    private final ListOfTasksRepository listOfTasksRepository = new ListOfTasksRepository();
 
     public void addToListById(int listId, int taskId){
         try{

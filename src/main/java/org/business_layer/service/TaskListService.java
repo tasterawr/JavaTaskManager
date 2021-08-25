@@ -9,7 +9,8 @@ import org.utils.CurrentUser;
 import java.util.List;
 
 public class TaskListService {
-    TaskListRepository taskListRepository = new TaskListRepository();
+    private final TaskListRepository taskListRepository = new TaskListRepository();
+    private final ListOfTasksService listOfTasksService = new ListOfTasksService();
 
     public void addTaskList(String name){
         try{
@@ -70,6 +71,7 @@ public class TaskListService {
     public void deleteTaskList(int id){
         try {
             taskListRepository.delete(id);
+            listOfTasksService.deleteListOfTasks(id);
         }
         catch (DAOException e){
             throw new DomainException(e.getMessage(), e);

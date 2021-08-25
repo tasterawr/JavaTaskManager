@@ -3,14 +3,17 @@ package org.interface_layer.view;
 import java.util.Scanner;
 
 public class MainMenuView {
-    private Scanner input = new Scanner(System.in);
-    private EditTasksView editTasksView = new EditTasksView();
-    private EditTasksListView editTasksListView = new EditTasksListView();
-    private TaskSearchView taskSearchView = new TaskSearchView();
+    private final Scanner input = new Scanner(System.in);
+    private final EditTasksView editTasksView = new EditTasksView();
+    private final EditTasksListView editTasksListView = new EditTasksListView();
+    private final TaskSearchView taskSearchView = new TaskSearchView();
+    private final OverdueTasksView overdueTasksView = new OverdueTasksView();
 
     public void displayMainMenu(){
         boolean show = true;
         while(show){
+            overdueTasksView.displayOverdueTasks();
+
             System.out.println();
             System.out.println("------MAIN MENU------");
             System.out.println("1. Edit tasks");

@@ -12,12 +12,15 @@ import java.util.Scanner;
 
 public class EditTasksListView {
     private final Scanner input = new Scanner(System.in);
+    private final OverdueTasksView overdueTasksView = new OverdueTasksView();
     private final TaskListController taskListController = new TaskListController();
     private final ListOfTasksController listOfTasksController = new ListOfTasksController();
 
     public void displayEditTaskListsPage(){
         boolean show = true;
         while(show) {
+            overdueTasksView.displayOverdueTasks();
+
             System.out.println();
             System.out.println("------EDIT TASK LISTS------");
             System.out.println("1. Show all user task lists");
