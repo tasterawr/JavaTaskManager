@@ -41,6 +41,6 @@ public class MainMenuView {
     }
 
     private void displaySearchForTaskPage(){
-
+        taskSearchView.displaySearchMenu();
     }
 }

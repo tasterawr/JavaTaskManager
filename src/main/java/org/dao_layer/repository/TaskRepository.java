@@ -8,7 +8,9 @@ import org.dao_layer.model.Task;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TaskRepository implements IRepository<Task>{
     static final Logger LOGGER = Logger.getLogger(TaskRepository.class);
@@ -103,24 +105,24 @@ public class TaskRepository implements IRepository<Task>{
         return null;
     }
 
-    public List<Task> getAllUserTasks(int userId){
+    public Set<Task> getUserTasks(int userId, String condition){
         Connection connection = null;
         PreparedStatement statement = null;
         try{
             connection = DatabaseConnector.connect();
             String sql =
-                    " SELECT T.id, T.name, T.description, T.alert_time" +
+                    " SELECT task.id, task.name, task.description, task.alert_time" +
                     " FROM (SELECT L.task_id" +
                     " FROM task_list TL INNER JOIN list_of_tasks L" +
                     " ON TL.id = L.list_id" +
                     " WHERE user_id = ?) TAB" +
-                    "   INNER JOIN task T" +
-                    "   ON TAB.task_id = T.id";
+                    "   INNER JOIN task" +
+                    "   ON TAB.task_id = task.id " + condition; //stands for condition, might be empty string
 
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
-            List<Task> tasks = new ArrayList<>();
+            Set<Task> tasks = new HashSet<>();
             while(resultSet.next()){
                 Task task = new Task();
                 task.setId(resultSet.getInt("id"));

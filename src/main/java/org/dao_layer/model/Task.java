@@ -2,6 +2,7 @@ package org.dao_layer.model;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class Task extends Entity{
     private int id;
@@ -64,5 +65,18 @@ public class Task extends Entity{
                 "\nAlert date: " + alertTime +
                 "\nAlert Received: " + alert +
                 "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, alertTime, alertReceived);
     }
 }

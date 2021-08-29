@@ -12,6 +12,7 @@ import org.utils.MessageGenerator;
 import java.sql.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class EditTasksView {
     private final Scanner input = new Scanner(System.in);
@@ -58,7 +59,7 @@ public class EditTasksView {
     private void showAllTasks(){
         System.out.println("------TASKS FOR " + CurrentUser.getUser().getUsername() + "------");
         try{
-            List<Task> tasks = taskController.getAllUserTasks();
+            Set<Task> tasks = taskController.getAllUserTasks();
             if (tasks.size() == 0){
                 System.out.println();
             }

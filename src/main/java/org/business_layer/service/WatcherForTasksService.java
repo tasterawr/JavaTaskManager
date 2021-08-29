@@ -4,18 +4,18 @@ import org.dao_layer.model.Task;
 import org.dao_layer.repository.TaskRepository;
 import org.exceptions.DAOException;
 import org.exceptions.DomainException;
-import org.utils.CurrentUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class WatcherForTasksService {
     private final TaskRepository taskRepository = new TaskRepository();
     private static List<Integer> shownTasksIds = new ArrayList<>();
 
-    public List<Task> getUserTasks(int userId){
+    public Set<Task> getUserTasks(int userId){
         try {
-            return taskRepository.getAllUserTasks(userId);
+            return taskRepository.getUserTasks(userId, "");
         }
         catch (DomainException | DAOException e){
             throw e;
@@ -24,7 +24,7 @@ public class WatcherForTasksService {
 
     public List<Task> getOverdueTasks(int userId){
         try{
-            List<Task> userTasks = getUserTasks(userId);
+            Set<Task> userTasks = getUserTasks(userId);
             List<Task> overdueTasks = new ArrayList<>();
 
             for(Task task : userTasks){

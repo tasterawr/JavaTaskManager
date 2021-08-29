@@ -8,16 +8,19 @@ import org.dao_layer.repository.TaskRepository;
 import org.utils.CurrentUser;
 
 import java.sql.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class TaskService {
     TaskRepository taskRepository = new TaskRepository();
     TaskListService taskListService = new TaskListService();
     ListOfTasksService listOfTasksService = new ListOfTasksService();
 
-    public List<Task> getAllUserTasks(int userId){
+    public Set<Task> getAllUserTasks(int userId){
         try {
-            return taskRepository.getAllUserTasks(userId);
+            return taskRepository.getUserTasks(userId, "");
         }
         catch (DAOException e){
             throw new DomainException(e.getMessage(), e);
@@ -27,6 +30,55 @@ public class TaskService {
     public Task getTaskById(int id){
         try{
             return taskRepository.getEntity(id);
+        }
+        catch (DAOException e){
+            throw new DomainException(e.getMessage(), e);
+        }
+    }
+
+    public Set<Task> searchForTasks(String criteria, String inputData){
+        Set<Task> tasks = new HashSet<>();
+
+        try{
+            if (criteria.equals("name")){
+                String [] nameWords = inputData.split(" ");
+                for (String nameWord : nameWords){
+                    String condition = "WHERE LOWER(task.name) LIKE \'%" + nameWord.toLowerCase(Locale.ROOT) + "%\'";
+                    Set<Task> taskSet = taskRepository.getUserTasks(CurrentUser.getUser().getId(), condition);
+                    for (Task t : taskSet)
+                        tasks.add(t);
+                }
+            }
+            else if (criteria.equals("description")){
+                String [] descriptionWords = inputData.split(" ");
+                for (String word : descriptionWords){
+                    String condition = "WHERE LOWER(task.description) LIKE \'%" + word.toLowerCase(Locale.ROOT) + "%\'";
+                    Set<Task> taskSet = taskRepository.getUserTasks(CurrentUser.getUser().getId(), condition);
+                    for (Task t : taskSet)
+                        tasks.add(t);
+                }
+            }
+            else if (criteria.equals("alert_time")){
+                String condition = "WHERE task.alert_time = \'" + inputData + "\'";
+                Set<Task> taskSet = taskRepository.getUserTasks(CurrentUser.getUser().getId(), condition);
+                for (Task t : taskSet)
+                    tasks.add(t);
+            }
+            else if (criteria.equals("alert_time_range")){
+                String[] dates = inputData.split(" ");
+                String condition = "WHERE task.alert_time BETWEEN \'" + dates[0] + "\' AND \'" + dates[1] + "\'";
+                Set<Task> taskSet = taskRepository.getUserTasks(CurrentUser.getUser().getId(), condition);
+                for (Task t : taskSet)
+                    tasks.add(t);
+            }
+            else if (criteria.equals("deadline")){
+                String condition = "WHERE task.alert_time - CURRENT_DATE BETWEEN 0 AND " + inputData;
+                Set<Task> taskSet = taskRepository.getUserTasks(CurrentUser.getUser().getId(), condition);
+                for (Task t : taskSet)
+                    tasks.add(t);
+            }
+
+            return tasks;
         }
         catch (DAOException e){
             throw new DomainException(e.getMessage(), e);

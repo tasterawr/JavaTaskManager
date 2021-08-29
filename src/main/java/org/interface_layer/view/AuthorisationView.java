@@ -23,12 +23,17 @@ public class AuthorisationView {
             System.out.println("4. Exit");
 
             int option = Integer.parseInt(input.nextLine());
-            switch (option){
-                case 1: displayLogInPage(); break;
-                case 2: displaySignInPage(); break;
-                case 3: displayDeleteUserPage(); break;
-                case 4: show = false;
-                default: displayAuthorisationMenu();
+            if (option == 1){
+                displayLogInPage();
+            }
+            else if (option == 2){
+                displaySignInPage();
+            }
+            else if(option == 3){
+                displayDeleteUserPage();
+            }
+            else if (option == 4){
+                show = false;
             }
         }
     }

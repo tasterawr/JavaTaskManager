@@ -7,11 +7,12 @@ import org.business_layer.service.TaskService;
 import org.utils.CurrentUser;
 
 import java.util.List;
+import java.util.Set;
 
 public class TaskController {
     TaskService taskService = new TaskService();
 
-    public List<Task> getAllUserTasks(){
+    public Set<Task> getAllUserTasks(){
         try{
             return taskService.getAllUserTasks(CurrentUser.getUser().getId());
         }
@@ -23,6 +24,15 @@ public class TaskController {
     public Task getTaskById(int id){
         try{
             return taskService.getTaskById(id);
+        }
+        catch (DomainException e){
+            throw new InterfaceException(e.getMessage(), e);
+        }
+    }
+
+    public Set<Task> searchForTasks(String criteria, String inputData){
+        try{
+            return taskService.searchForTasks(criteria, inputData);
         }
         catch (DomainException e){
             throw new InterfaceException(e.getMessage(), e);
